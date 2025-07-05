@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from auditoria.models import LogEntry
+from .serializers import LogEntrySerializer
 
-# Create your views here.
+class LogEntryViewSet(viewsets.ModelViewSet):
+    queryset = LogEntry.objects.all()
+    serializer_class = LogEntrySerializer

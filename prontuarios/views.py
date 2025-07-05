@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from prontuarios.models import Prontuario
+from .serializers import ProntuarioSerializer
 
-# Create your views here.
+class ProntuarioViewSet(viewsets.ModelViewSet):
+    queryset = Prontuario.objects.all()
+    serializer_class = ProntuarioSerializer

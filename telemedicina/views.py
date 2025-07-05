@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from rest_framework import viewsets
+from telemedicina.models import Teleconsulta
+from .serializers import TeleconsultaSerializer
 
-# Create your views here.
+class TeleconsultaViewSet(viewsets.ModelViewSet):
+    queryset = Teleconsulta.objects.all()
+    serializer_class = TeleconsultaSerializer
