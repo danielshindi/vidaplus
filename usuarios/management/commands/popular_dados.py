@@ -1,9 +1,9 @@
 # App: usuarios.management.commands.popular_dados
+from django.db import transaction
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from datetime import timedelta
 import random
-
 from usuarios.models import Usuario, PerfilUsuario
 from pacientes.models import Paciente
 from profissionais.models import ProfissionalSaude
@@ -13,17 +13,6 @@ from internacoes.models import Internacao, Leito
 from relatorios.models import Relatorio
 from notificacoes.models import Notificacao
 from auditoria.models import LogEntry
-from django.db import transaction
-
-# novos imports
-from relatorios.models import Relatorio
-from notificacoes.models import Notificacao
-from auditoria.models import LogEntry
-from agendamentos.models import Consulta
-from telemedicina.models import Teleconsulta
-from internacoes.models import Internacao, Leito
-from profissionais.models import ProfissionalSaude
-from pacientes.models import Paciente
 from receitas.models import Receita
 from prontuarios.models import Prontuario
 
