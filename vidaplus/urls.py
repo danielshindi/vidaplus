@@ -16,35 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from usuarios.views import UsuarioViewSet, PerfilUsuarioViewSet
-from pacientes.views import PacienteViewSet
-from profissionais.views import ProfissionalSaudeViewSet
-from agendamentos.views import ConsultaViewSet
-from telemedicina.views import TeleconsultaViewSet
-from internacoes.views import InternacaoViewSet, LeitoViewSet
-from receitas.views import ReceitaViewSet
-from prontuarios.views import ProntuarioViewSet
-from notificacoes.views import NotificacaoViewSet
-from relatorios.views import RelatorioViewSet
-from auditoria.views import LogEntryViewSet
 
-router = DefaultRouter()
-router.register(r'usuarios', UsuarioViewSet)
-router.register(r'perfis', PerfilUsuarioViewSet)
-router.register(r'pacientes', PacienteViewSet)
-router.register(r'profissionais', ProfissionalSaudeViewSet)
-router.register(r'consultas', ConsultaViewSet)
-router.register(r'teleconsultas', TeleconsultaViewSet)
-router.register(r'internacoes', InternacaoViewSet)
-router.register(r'leitos', LeitoViewSet)
-router.register(r'receitas', ReceitaViewSet)
-router.register(r'prontuarios', ProntuarioViewSet)
-router.register(r'notificacoes', NotificacaoViewSet)
-router.register(r'relatorios', RelatorioViewSet)
-router.register(r'logs', LogEntryViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
+    path('api/usuarios/', include('usuarios.urls')),
+    path('api/pacientes/', include('pacientes.urls')),
+    path('api/profissionais/', include('profissionais.urls')),
+    path('api/agendamentos/', include('agendamentos.urls')),
+    path('api/telemedicina/', include('telemedicina.urls')),
+    path('api/internacoes/', include('internacoes.urls')),
+    path('api/receitas/', include('receitas.urls')),
+    path('api/prontuarios/', include('prontuarios.urls')),
+    path('api/notificacoes/', include('notificacoes.urls')),
+    path('api/relatorios/', include('relatorios.urls')),
+    path('api/auditoria/', include('auditoria.urls')),
 ]
