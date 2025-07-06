@@ -5,6 +5,4 @@ from .views import ConsultaViewSet
 router = DefaultRouter()
 router.register(r'consultas', ConsultaViewSet)
 
-urlpatterns = [
-    path('', include(router.urls)),
-]
+urlpatterns = router.urls

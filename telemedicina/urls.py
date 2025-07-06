@@ -5,6 +5,4 @@ from .views import TeleconsultaViewSet
 router = DefaultRouter()
 router.register(r'teleconsultas', TeleconsultaViewSet)
 
-urlpatterns = [
-    path('', include(router.urls)),
-]
+urlpatterns = router.urls
