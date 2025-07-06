@@ -29,3 +29,24 @@ class ConsultaViewSet(viewsets.ModelViewSet):
             id_entidade=instance.id,
             descricao=f'Consulta do paciente {instance.paciente.usuario.nome_completo} marcada com o profissional {instance.profissional.usuario.nome_completo} em {instance.data_hora}'
         )
+
+    def perform_update(self, serializer):
+        instance = self.get_object()  # Consulta antes da atualização
+        dados_antigos = {field: getattr(instance, field) for field in serializer.fields}
+        instance = serializer.save()  # Salva e atualiza os dados
+        dados_novos = {field: getattr(instance, field) for field in serializer.fields}
+
+        alteracoes = []
+        for campo in dados_antigos:
+            if dados_antigos[campo] != dados_novos[campo]:
+                alteracoes.append(f"{campo}: '{dados_antigos[campo]}' → '{dados_novos[campo]}'")
+
+        descricao = "Atualização da Consulta.\n" + "\n".join(alteracoes) if alteracoes else "Atualização sem mudanças detectadas."
+
+        from auditoria.utils import registrar_log
+        registrar_log(self.request.user, 'atualizar', 'Consulta', instance.id, descricao)
+
+
+    def perform_destroy(self, instance):
+        registrar_log(self.request.user, 'remover', 'Consulta', instance.id, 'Consulta removida.')
+        instance.delete()
