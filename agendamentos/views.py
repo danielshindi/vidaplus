@@ -3,6 +3,7 @@ from agendamentos.models import Consulta
 from .serializers import ConsultaSerializer
 from rest_framework.permissions import IsAuthenticated
 from usuarios.permissoes.perfis import IsAdministradorOrProfissional
+from auditoria.utils import registrar_log
 
 class ConsultaViewSet(viewsets.ModelViewSet):
     queryset = Consulta.objects.all()
@@ -18,3 +19,13 @@ class ConsultaViewSet(viewsets.ModelViewSet):
         elif user.perfil.nome_perfil == 'Profissional de Saúde':
             return Consulta.objects.filter(profissional__usuario=user)
         return super().get_queryset()
+    
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        registrar_log(
+            usuario=self.request.user,
+            acao='criar',
+            entidade='Consulta',
+            id_entidade=instance.id,
+            descricao=f'Consulta do paciente {instance.paciente.usuario.nome_completo} marcada com o profissional {instance.profissional.usuario.nome_completo} em {instance.data_hora}'
+        )

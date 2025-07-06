@@ -8,3 +8,6 @@ class RelatorioViewSet(viewsets.ModelViewSet):
     queryset = Relatorio.objects.all()
     serializer_class = RelatorioSerializer
     permission_classes = [IsAuthenticated, IsAdministrador]
+
+    def perform_create(self, serializer):
+        serializer.save(administrador=self.request.user.administrador)
