@@ -43,7 +43,6 @@ class ConsultaViewSet(viewsets.ModelViewSet):
 
         descricao = "Atualização da Consulta.\n" + "\n".join(alteracoes) if alteracoes else "Atualização sem mudanças detectadas."
 
-        from auditoria.utils import registrar_log
         registrar_log(self.request.user, 'atualizar', 'Consulta', instance.id, descricao)
 
 
