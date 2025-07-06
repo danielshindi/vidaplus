@@ -9,6 +9,14 @@ class InternacaoViewSet(viewsets.ModelViewSet):
     serializer_class = InternacaoSerializer
     permission_classes = [IsAuthenticated, IsAdministradorOrProfissional]
 
+    def get_queryset(self):
+        user = self.request.user
+        if user.perfil.nome_perfil == 'Paciente':
+            return Internacao.objects.filter(paciente__usuario=user)
+        elif user.perfil.nome_perfil == 'Profissional de Saúde':
+            return Internacao.objects.filter(profissional__usuario=user)
+        return Internacao.objects.all()
+
 
 class LeitoViewSet(viewsets.ModelViewSet):
     queryset = Leito.objects.all()

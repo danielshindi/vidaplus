@@ -22,3 +22,11 @@ class Internacao(models.Model):
 
     def __str__(self):
         return f"Internação de {self.paciente.usuario.nome_completo} no leito {self.leito.numero}"
+    
+    def save(self, *args, **kwargs):
+        if self.data_saida:
+            self.leito.disponivel = True
+        else:
+            self.leito.disponivel = False
+        self.leito.save()
+        super().save(*args, **kwargs)
