@@ -9,6 +9,13 @@ class PerfilUsuarioSerializer(serializers.ModelSerializer):
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
     class Meta:
         model = Usuario
-        exclude = ['password']  # Protege a senha no retorno da API
+        exclude = ['last_login']
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = Usuario.objects.create_user(**validated_data, password=password)
+        return user
