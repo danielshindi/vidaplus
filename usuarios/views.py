@@ -1,6 +1,6 @@
 from rest_framework import viewsets, filters
 from usuarios.models import Usuario, PerfilUsuario
-from .serializers import UsuarioSerializer, PerfilUsuarioSerializer
+from .serializers import UsuarioSerializer, PerfilUsuarioSerializer, UsuarioWriteSerializer
 from rest_framework.permissions import IsAuthenticated
 from usuarios.permissoes.perfis import IsAdministrador
 from auditoria.utils import registrar_log
@@ -13,7 +13,6 @@ class PerfilUsuarioViewSet(viewsets.ModelViewSet):
 
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
-    serializer_class = UsuarioSerializer
     permission_classes = [IsAuthenticated, IsAdministrador]
     filter_backends = [filters.SearchFilter]
     search_fields = ['matricula', 'nome_completo', 'email', 'cpf']
@@ -25,7 +24,13 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(perfil_id=perfil_id)
         return queryset
     
+    def get_serializer_class(self):
+        if self.action in ['create', 'update', 'partial_update']:
+            return UsuarioWriteSerializer
+        return UsuarioSerializer
+    
     def perform_create(self, serializer):
+        print('criando usuario')
         instance = serializer.save()
         registrar_log(
             usuario=self.request.user,
