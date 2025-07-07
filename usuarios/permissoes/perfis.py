@@ -52,3 +52,21 @@ class IsSelfOrAdmin(BasePermission):
         if hasattr(request.user, 'perfil') and request.user.perfil.nome_perfil == 'Administrador':
             return True
         return obj.usuario == request.user
+    
+# permissions.py
+from rest_framework.permissions import BasePermission, SAFE_METHODS
+
+class IsPacienteOrAdminOrProfissional(BasePermission):
+    def has_permission(self, request, view):
+        perfil = getattr(request.user.perfil, "nome_perfil", "").lower()
+        if perfil in ["administrador", "profissional"]:
+            return True
+        if perfil == "paciente" and view.action in ['create', 'list', 'retrieve', 'destroy']:
+            return True
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        perfil = getattr(request.user.perfil, "nome_perfil", "").lower()
+        if perfil == "paciente":
+            return obj.paciente.usuario == request.user
+        return True

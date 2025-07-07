@@ -1,33 +1,40 @@
 from rest_framework import viewsets, filters
-from agendamentos.models import Consulta
+from agendamentos.models import Consulta, Paciente
 from .serializers import ConsultaSerializer
 from rest_framework.permissions import IsAuthenticated
-from usuarios.permissoes.perfis import IsAdministradorOrProfissional
+from usuarios.permissoes.perfis import IsPacienteOrAdminOrProfissional
 from auditoria.utils import registrar_log
+from django.shortcuts import get_object_or_404
 
 class ConsultaViewSet(viewsets.ModelViewSet):
-    queryset = Consulta.objects.all()
+    queryset = Consulta.objects.all().select_related('paciente__usuario', 'profissional__usuario')
     serializer_class = ConsultaSerializer
-    permission_classes = [IsAuthenticated, IsAdministradorOrProfissional]
+    permission_classes = [IsAuthenticated, IsPacienteOrAdminOrProfissional]
     filter_backends = [filters.SearchFilter]
-    search_fields = ['paciente__usuario__nome_completo', 'profissional__usuario__nome_completo']
+    search_fields = ['status']
 
     def get_queryset(self):
-        user = self.request.user
-        if user.perfil.nome_perfil == 'Paciente':
-            return Consulta.objects.filter(paciente__usuario=user)
-        elif user.perfil.nome_perfil == 'Profissional de Saúde':
-            return Consulta.objects.filter(profissional__usuario=user)
+        perfil = getattr(self.request.user.perfil, "nome_perfil", "").lower()
+        if perfil == "paciente":
+            return Consulta.objects.filter(paciente__usuario=self.request.user)
         return super().get_queryset()
     
     def perform_create(self, serializer):
-        instance = serializer.save()
+        perfil = getattr(self.request.user.perfil, "nome_perfil", "").lower()
+
+        if perfil == "paciente":
+            paciente = get_object_or_404(Paciente, usuario=self.request.user)
+            serializer.save(paciente=paciente)
+        else:
+            serializer.save()
+
+        instance = serializer.instance
         registrar_log(
             usuario=self.request.user,
             acao='criar',
             entidade='Consulta',
             id_entidade=instance.id,
-            descricao=f'Consulta do paciente {instance.paciente.usuario.nome_completo} marcada com o profissional {instance.profissional.usuario.nome_completo} em {instance.data_hora}'
+            descricao=f'Consulta criada para o paciente {instance.paciente} com o profissional {instance.profissional}.'
         )
 
     def perform_update(self, serializer):
@@ -47,5 +54,5 @@ class ConsultaViewSet(viewsets.ModelViewSet):
 
 
     def perform_destroy(self, instance):
-        registrar_log(self.request.user, 'remover', 'Consulta', instance.id, 'Consulta removida.')
+        registrar_log(self.request.user, 'remover', 'Consulta', instance.id, 'Consulta cancelada.')
         instance.delete()
