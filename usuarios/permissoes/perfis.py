@@ -9,7 +9,7 @@ class IsAdministrador(BasePermission):
 class IsProfissionalSaude(BasePermission):
     """Permite acesso apenas a profissionais de saúde."""
     def has_permission(self, request, view):
-        return hasattr(request.user, 'perfil') and request.user.perfil.nome_perfil == 'Profissional de Saúde'
+        return hasattr(request.user, 'perfil') and request.user.perfil.nome_perfil == 'Profissional'
 
 
 class IsPaciente(BasePermission):
@@ -23,7 +23,7 @@ class IsAdministradorOrProfissional(BasePermission):
     def has_permission(self, request, view):
         return (
             hasattr(request.user, 'perfil') and
-            request.user.perfil.nome_perfil in ['Administrador', 'Profissional de Saúde']
+            request.user.perfil.nome_perfil in ['Administrador', 'Profissional']
         )
 
 
@@ -41,7 +41,7 @@ class IsPacienteOrProfissional(BasePermission):
     def has_permission(self, request, view):
         return (
             hasattr(request.user, 'perfil') and
-            request.user.perfil.nome_perfil in ['Paciente', 'Profissional de Saúde']
+            request.user.perfil.nome_perfil in ['Paciente', 'Profissional']
         )
 
 class IsSelfOrAdmin(BasePermission):
