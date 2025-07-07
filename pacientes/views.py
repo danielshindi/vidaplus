@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from pacientes.models import Paciente
-from .serializers import PacienteSerializer
+from .serializers import PacienteSerializer, PacienteCompletoSerializer
 from rest_framework.permissions import IsAuthenticated
 from usuarios.permissoes.perfis import IsAdministrador
 from auditoria.utils import registrar_log
@@ -39,3 +39,9 @@ class PacienteViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         registrar_log(self.request.user, 'remover', 'Paciente', instance.id, 'Paciente removido.')
         instance.delete()
+
+
+class PacienteCompletoViewSet(viewsets.ModelViewSet):
+    queryset = Paciente.objects.all().select_related('usuario')
+    serializer_class = PacienteCompletoSerializer
+    permission_classes = [IsAuthenticated]

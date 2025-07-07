@@ -13,7 +13,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Usuario
-        exclude = ['last_login']
+        exclude = ['last_login', 'groups', 'user_permissions']
 
     def create(self, validated_data):
         password = validated_data.pop('password')
