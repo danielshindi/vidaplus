@@ -49,8 +49,8 @@ class UsuarioManager(BaseUserManager):
 class Usuario(AbstractBaseUser, PermissionsMixin):
     matricula = models.CharField(max_length=7, unique=True)
     nome_completo = models.CharField(max_length=255, null=False, blank=False)
-    email = models.EmailField(null=False, blank=False)
-    cpf = models.CharField(max_length=11, null=False, blank=False)
+    email = models.EmailField(null=False, blank=False, unique=True)
+    cpf = models.CharField(max_length=11, null=False, blank=False, unique=True)
     telefone = models.CharField(max_length=20, null=False, blank=False)
     nascimento = models.DateField(null=False, blank=False)
     endereco = models.CharField(max_length=255, null=False, blank=False)
