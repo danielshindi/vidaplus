@@ -1,8 +1,10 @@
-from rest_framework import viewsets
-from prontuarios.models import Prontuario
+from rest_framework import viewsets, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from prontuarios.models import Prontuario, Paciente
 from .serializers import ProntuarioSerializer
 from rest_framework.permissions import IsAuthenticated
-from usuarios.permissoes.perfis import IsAdministradorOrProfissional
+from usuarios.permissoes.perfis import IsAdministradorOrProfissional, IsProfissionalSaude
 from auditoria.utils import registrar_log
 
 
@@ -48,3 +50,27 @@ class ProntuarioViewSet(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         registrar_log(self.request.user, 'remover', 'Prontuario', instance.id, 'Prontuario removido.')
         instance.delete()
+
+
+class HistoricoMedicoView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        usuario = request.user
+        paciente_id = request.query_params.get('paciente_id')
+
+        if hasattr(usuario, 'paciente'):
+            paciente = usuario.paciente
+        elif hasattr(usuario, 'profissionalsaude'):
+            if not paciente_id:
+                return Response({'erro': 'É necessário informar paciente_id.'}, status=400)
+            try:
+                paciente = Paciente.objects.get(id=paciente_id)
+            except Paciente.DoesNotExist:
+                return Response({'erro': 'Paciente não encontrado.'}, status=404)
+        else:
+            return Response({'erro': 'Usuário sem permissão para acessar prontuários.'}, status=403)
+
+        prontuarios = Prontuario.objects.filter(paciente=paciente)
+        serializer = ProntuarioSerializer(prontuarios, many=True)
+        return Response(serializer.data)

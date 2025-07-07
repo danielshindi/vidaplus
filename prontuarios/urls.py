@@ -1,7 +1,11 @@
 from rest_framework.routers import DefaultRouter
-from .views import ProntuarioViewSet
+from django.urls import path, include
+from .views import ProntuarioViewSet, HistoricoMedicoView
 
 router = DefaultRouter()
 router.register(r'', ProntuarioViewSet)
 
-urlpatterns = router.urls
+urlpatterns = [
+    path('historico/', HistoricoMedicoView.as_view(), name='historico-medico'),
+    path('', include(router.urls)),
+]
