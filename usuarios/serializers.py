@@ -26,14 +26,3 @@ class UsuarioWriteSerializer(serializers.ModelSerializer):
         user = Usuario.objects.create_user(**validated_data, password=password)
         return user
 
-    def validate_matricula(self, value):
-        if self.instance:
-            # Permite a mesma matrícula ao atualizar o mesmo usuário
-            if self.instance.matricula == value:
-                return value
-            if Usuario.objects.exclude(id=self.instance.id).filter(matricula=value).exists():
-                raise serializers.ValidationError("Já existe um usuário com essa matrícula.")
-        else:
-            if Usuario.objects.filter(matricula=value).exists():
-                raise serializers.ValidationError("Já existe um usuário com essa matrícula.")
-        return value
