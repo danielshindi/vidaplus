@@ -53,8 +53,6 @@ class IsSelfOrAdmin(BasePermission):
             return True
         return obj.usuario == request.user
     
-# permissions.py
-from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 class IsPacienteOrAdminOrProfissional(BasePermission):
     def has_permission(self, request, view):

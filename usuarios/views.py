@@ -30,7 +30,6 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         return UsuarioSerializer
     
     def perform_create(self, serializer):
-        print('criando usuario')
         instance = serializer.save()
         registrar_log(
             usuario=self.request.user,
